@@ -10,8 +10,14 @@ public class Polygon {
     public Polygon(Vertex[] vertexes, Vertex normal) {
         int vertexNum = vertexes.length;
         
-        for (int i = 0; i < vertexNum; i++) {
-            this.vertexes[i] = vertexes[i];
+        if (needRevert(vertexes, normal)) {
+            for (int i = 0; i < vertexNum; i++) {
+                this.vertexes[i] = vertexes[vertexNum - i - 1];
+            }
+        } else {
+            for (int i = 0; i < vertexNum; i++) {
+                this.vertexes[i] = vertexes[i];
+            }
         }
         
         for (int i = 0; i < vertexNum; i++) {
@@ -19,6 +25,23 @@ public class Polygon {
         }
         
         this.normal = normal;
+    }
+    
+    private boolean needRevert(Vertex[] vertexes, Vertex normal) {
+        double x1 = vertexes[1].getX() - vertexes[0].getX();
+        double y1 = vertexes[1].getY() - vertexes[0].getY();
+        double z1 = vertexes[1].getZ() - vertexes[0].getZ();
+        double x2 = vertexes[2].getX() - vertexes[1].getX();
+        double y2 = vertexes[2].getY() - vertexes[1].getY();
+        double z2 = vertexes[2].getX() - vertexes[1].getX();
+        
+        if (((y1 * z2 + z1 * y2) * normal.getX() < 0) ||
+                ((z1 * x2 + x1 * z2) * normal.getX() < 0) ||
+                ((x1 * y2 + y1 * x2) * normal.getX() < 0)) {
+            return true;
+        }
+        
+        return false;
     }
 
     public Vertex[] getVertexes() {
