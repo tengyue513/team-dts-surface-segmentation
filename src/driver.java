@@ -6,5 +6,6 @@ public class driver {
 		sr.bfs();
 		System.out.println(sr.groupTable.values());
 		System.out.println(sr.vertexIndexTable);
+		VrmlWriter.write(sr.groupTable, sr.vertexIndexTable, "test.wrl");
 	}
 }
