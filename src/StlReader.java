@@ -111,7 +111,9 @@ public class StlReader {
 	public static void bfs(double threshold) {
 		int groupCounter = -1;
 		System.out.println("total polygon number: "+polygonCounter);
+		groupTable = new Hashtable<Polygon, Integer>();
 		for (int i = 0; i < polygonCounter; i++) {
+			int ptr=0;
 			// check first whether included in a group
 			if (groupTable.containsKey(polygons.get(i))) {
 				continue;
@@ -122,46 +124,59 @@ public class StlReader {
 			LinkedList<Polygon> todoList = new LinkedList<>();
 			todoList.add(startP);
 			groupTable.put(startP, groupCounter);
-			while (!todoList.isEmpty()) {
-				int size = todoList.size();
-				for (int j = 0; j < size; j++) {
-					Polygon currPolygon = todoList.getFirst();
-					for (Edge e : currPolygon.getEdges()) {
-						ArrayList<Integer> shareEdgeList = edgeTable.get(e);
-						if (shareEdgeList.size() != 2) {
-							System.out.println("incorrect shared edge "+shareEdgeList.size());
-						}
-						//System.out.println("correct shared edge "+shareEdgeList.size());
-						Polygon nearPolygon = polygons.get(shareEdgeList.get(0));
-						if (!nearPolygon.equals(currPolygon)) {
-							if(getAngle(currPolygon, nearPolygon) <= threshold) {
-								if (groupTable.containsKey(nearPolygon)) {
-									continue;
-								}
+			while (todoList.size()>ptr) {
+				Polygon currPolygon = todoList.get(ptr);
+				if (!groupTable.containsKey(currPolygon)) {
+					groupTable.put(currPolygon, groupCounter);
+				}
+				for (Edge e : currPolygon.getEdges()) {
+					ArrayList<Integer> shareEdgeList = edgeTable.get(e);
+					if (shareEdgeList.size() != 2) {
+						System.out.println("incorrect shared edge "+shareEdgeList.size());
+						continue;
+					}
+					Polygon nearPolygon = polygons.get(shareEdgeList.get(0));
+					//System.out.println("before");
+					if (!nearPolygon.equals(currPolygon)) {
+						if(getAngle(currPolygon, nearPolygon) < threshold) {
+							if (!groupTable.containsKey(nearPolygon)) {	
 								todoList.add(nearPolygon);
 								groupTable.put(nearPolygon, groupCounter);
 							}
-							//polygons.get(shareEdgeList.get(0));
-							//System.out.println("one diff");
+						} else {
+							//System.out.println("line 149 impossible");
+							//System.out.println(getAngle(currPolygon, nearPolygon));
 						}
+						//polygons.get(shareEdgeList.get(0));
+						//System.out.println("line 144 one diff");
+					} else {
 						nearPolygon = polygons.get(shareEdgeList.get(1));
 						if (!nearPolygon.equals(currPolygon)) {
-							if (getAngle(currPolygon, nearPolygon) <= threshold) {
-								if (groupTable.containsKey(nearPolygon)) {
-									continue;
+							if (getAngle(currPolygon, nearPolygon) < threshold) {
+								//							System.out.println("contains");
+								if (!groupTable.containsKey(nearPolygon)) {
+									todoList.add(nearPolygon);
+									groupTable.put(nearPolygon, groupCounter);
 								}
-								todoList.add(nearPolygon);
-								groupTable.put(nearPolygon, groupCounter);
+							} else {
+								//System.out.println("line 163 impossible");
+								//System.out.println(getAngle(currPolygon, nearPolygon));
 							}
 							//todoList.add(polygons.get(shareEdgeList.get(1)));
-							//System.out.println("one diff");
+							//System.out.println("line 156 one diff");
+						} else {
+							System.out.println("line 168 impossible");
 						}
 					}
-					//System.out.println("prev size"+todoList.size());
-					todoList.remove();
-					//System.out.println(todoList.size());
+					//System.out.println("after");
 				}
+				//System.out.println("prev size"+todoList.size());
+				//todoList.remove();
+				ptr++;
+				//System.out.println(ptr);
+				//System.out.println(todoList.size());
 			}
+			//System.out.println("group number: "+(groupCounter+1));
 		}
 		System.out.println("group number: "+(groupCounter+1));
 	}
@@ -180,16 +195,29 @@ public class StlReader {
 		double m1 = getModule(n1);
 		double m2 = getModule(n2);
 		double numerator = n1.getX()*n2.getX()+n1.getY()*n2.getY()+n1.getZ()*n2.getZ(); 
-		if (m1*m2 == 0) {
+		double epsilon = Math.pow(10, -5);
+		if (m1*m2 == 0.0 || Math.abs(numerator/(m1*m2)) < epsilon) {
 			//System.out.println(Math.toDegrees(Math.PI/2));
 			return Math.PI/2;
 		}
-		if (numerator < 0) {
+		if (Math.abs(numerator/(m1*m2)) >= 1.0) {
+			return 0.0;
+		}
+		if (numerator < 0.0) {
 			//System.out.println(Math.toDegrees(Math.PI/2+Math.acos(Math.abs(numerator/m1*m2))));
-			return Math.PI - Math.acos(Math.abs(numerator/m1*m2));
+//			if (Math.PI - Math.acos(Math.abs(numerator/m1*m2)) > Math.PI/2) {
+//				System.out.println(Math.PI - Math.acos(Math.abs(numerator/(m1*m2))));
+//			}
+		//	System.out.println("numerator:"+numerator);
+			//System.out.println("m1*m2:"+(m1*m2));
+			return Math.PI - Math.acos(Math.abs(numerator/(m1*m2)));
 		} else {
-			//System.out.println(Math.toDegrees(Math.acos(numerator/m1*m2)));
-			return Math.acos(numerator/m1*m2);
+//			if (Math.acos(numerator/m1*m2) > Math.PI/2) {
+//				System.out.println(Math.acos(numerator/(m1*m2)));
+//			}
+			//System.out.println("numerator:"+numerator);
+			//System.out.println("m1*m2:"+(m1*m2));
+			return Math.acos(numerator/(m1*m2));
 		}
 	}
 }
