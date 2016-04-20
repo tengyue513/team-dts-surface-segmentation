@@ -11,6 +11,7 @@ import java.util.List;
 public class VrmlWriter {
 
     public static void write(Hashtable<Polygon, Integer> groupTable,
+            ArrayList<Vertex> vertexList,
             Hashtable<Vertex, Integer> vertexIndexTable, String filename) {
         try {
             File file = new File(filename);
@@ -24,7 +25,7 @@ public class VrmlWriter {
             writer.write("coord Coordinate{\n");
             writer.write("point[");
 
-            Iterator<Vertex> itr = vertexIndexTable.keySet().iterator();
+            Iterator<Vertex> itr = vertexList.iterator();
             if (itr.hasNext()) {
                 Vertex v = itr.next();
                 writer.write(v.getX() + " ");

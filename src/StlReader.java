@@ -15,10 +15,12 @@ public class StlReader {
 	 * each vertex corresponds to a list of polygons
 	 */
 	public static Hashtable<Vertex, ArrayList<Integer>> vertexTable = new Hashtable<>();
+	public static ArrayList<Vertex> vertexList;
 	/**.
 	 * store all the vertex in one set
 	 */
 	public static Hashtable<Vertex,Integer> vertexIndexTable = new Hashtable<>();
+	
 	public static void readFile(String fileName) {
 		read(fileName);
 	}
@@ -80,8 +82,9 @@ public class StlReader {
 					polygonCounter++; // start from 0
 				}
 			}
+			vertexList = new ArrayList(vertexTable.keySet());
 			int value = 0;
-			for (Vertex v : vertexTable.keySet()) {
+			for (Vertex v : vertexList) {
 				vertexIndexTable.put(v, value);
 				value++;
 			}
