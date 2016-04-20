@@ -103,7 +103,7 @@ public class StlReader {
 			e.printStackTrace();
 		}
 	}
-	public static void bfs() {
+	public static void bfs(double threshold) {
 		int groupCounter = -1;
 		System.out.println("total polygon number: "+polygonCounter);
 		for (int i = 0; i < polygonCounter; i++) {
@@ -128,7 +128,7 @@ public class StlReader {
 					//System.out.println("correct shared edge "+shareEdgeList.size());
 					Polygon nearPolygon = polygons.get(shareEdgeList.get(0));
 					if (!nearPolygon.equals(currPolygon)) {
-						if(getAngle(currPolygon, nearPolygon) <= Math.PI/2) {
+						if(getAngle(currPolygon, nearPolygon) <= threshold) {
 							todoList.add(nearPolygon);
 							groupTable.put(nearPolygon, groupCounter);
 						}
@@ -137,7 +137,7 @@ public class StlReader {
 					}
 					nearPolygon = polygons.get(shareEdgeList.get(1));
 					if (!nearPolygon.equals(currPolygon)) {
-						if (getAngle(currPolygon, nearPolygon) <= Math.PI/2) {
+						if (getAngle(currPolygon, nearPolygon) <= threshold) {
 							todoList.add(nearPolygon);
 							groupTable.put(nearPolygon, groupCounter);
 						}
