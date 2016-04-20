@@ -35,18 +35,16 @@ public class Polygon {
         double y2 = vertexes[2].getY() - vertexes[1].getY();
         double z2 = vertexes[2].getZ() - vertexes[1].getZ();
         
-        if (((y1 * z2 - z1 * y2) * normal.getX() < 0) ||
-                ((z1 * x2 - x1 * z2) * normal.getY() < 0) ||
-                ((x1 * y2 - y1 * x2) * normal.getZ() < 0)) {
-            System.out.println(y1 * z2 + z1 * y2);
-            System.out.println(z1 * x2 + x1 * z2);
-            System.out.println(x1 * y2 + y1 * x2);
+        
+        if (((y1 * z2 - z1 * y2) * normal.getX() +
+                (z1 * x2 - x1 * z2) * normal.getY() +
+                (x1 * y2 - y1 * x2) * normal.getZ()) < 0) {
             return true;
         }
         
         return false;
     }
-
+    
     public Vertex[] getVertexes() {
         return vertexes;
     }
