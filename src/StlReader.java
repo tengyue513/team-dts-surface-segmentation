@@ -38,13 +38,15 @@ public class StlReader {
 				line = scan.nextLine();
 				// one polygon
 				if (line.contains("facet normal")) { // 1st line
-					String[] words = line.trim().split(" ");
+					String[] words = line.trim().split("\\s+");
 					normal = new Vertex(Double.parseDouble(words[2]),Double.parseDouble(words[3]),
 							Double.parseDouble(words[4]));
 					// store normal
 					//System.out.println("normal:+"+line);
 					int i = 0;
-					while(!(line = scan.nextLine()).contains("end facet")) {
+					line = scan.nextLine();
+					while(!line.contains("end facet")&&!line.contains("endfacet")) {
+						line = scan.nextLine();
 						// store vertex
 						if (line.contains("vertex")) {
 							words = line.trim().split(" ");
