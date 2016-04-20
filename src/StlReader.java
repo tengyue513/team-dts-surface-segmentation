@@ -49,7 +49,7 @@ public class StlReader {
 						line = scan.nextLine();
 						// store vertex
 						if (line.contains("vertex")) {
-							words = line.trim().split(" ");
+							words = line.trim().split("\\s+");
 							point[i] = new Vertex(Double.parseDouble(words[1]),Double.parseDouble(words[2]),
 									Double.parseDouble(words[3]));
 							//System.out.println("vertex"+i+":"+point[i]);
