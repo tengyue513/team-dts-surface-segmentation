@@ -34,7 +34,7 @@ public class VrmlWriter {
             }
             while (itr.hasNext()) {
                 Vertex v = itr.next();
-                writer.write(", ");
+                writer.write(",\n");
                 writer.write(v.getX() + " ");
                 writer.write(v.getY() + " ");
                 writer.write(v.getZ() + "");
@@ -56,7 +56,7 @@ public class VrmlWriter {
             while (itrP.hasNext()) {
                 Polygon p = itrP.next();
                 Vertex[] vertices = p.getVertexes();
-                writer.write(", ");
+                writer.write(",\n");
                 writer.write(vertexIndexTable.get(vertices[0]) + " ");
                 writer.write(vertexIndexTable.get(vertices[1]) + " ");
                 writer.write(vertexIndexTable.get(vertices[2]) + " ");
@@ -77,7 +77,7 @@ public class VrmlWriter {
             writer.write(rgb[2] + "");
             for (int i = 1; i <= max; i++) {
                 rgb = mapToRGB((double) i / max);
-                writer.write(", ");
+                writer.write(",\n");
                 writer.write(rgb[0] + " ");
                 writer.write(rgb[1] + " ");
                 writer.write(rgb[2] + "");
@@ -99,7 +99,7 @@ public class VrmlWriter {
             while (itrP.hasNext()) {
                 Polygon p = itrP.next();
                 Vertex[] vertices = p.getVertexes();
-                writer.write(", ");
+                writer.write(",\n");
                 writer.write(groupTable.get(p) + " ");
                 writer.write(groupTable.get(p) + " ");
                 writer.write(groupTable.get(p) + " ");
