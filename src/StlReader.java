@@ -108,10 +108,10 @@ public class StlReader {
 		System.out.println("total polygon number: "+polygonCounter);
 		for (int i = 0; i < polygonCounter; i++) {
 			// check first whether included in a group
-			groupCounter++;
 			if (groupTable.containsKey(polygons.get(i))) {
 				continue;
 			}
+			groupCounter++;
 			Polygon startP = polygons.get(i);
 			System.out.println("grouping for "+i+"st polygon");
 			LinkedList<Polygon> todoList = new LinkedList<>();
