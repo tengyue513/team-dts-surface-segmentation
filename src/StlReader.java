@@ -20,7 +20,7 @@ public class StlReader {
 	 * store all the vertex in one set
 	 */
 	public static Hashtable<Vertex,Integer> vertexIndexTable = new Hashtable<>();
-	
+
 	public static void readFile(String fileName) {
 		read(fileName);
 	}
@@ -118,41 +118,52 @@ public class StlReader {
 			}
 			groupCounter++;
 			Polygon startP = polygons.get(i);
-			System.out.println("grouping for "+i+"st polygon");
+			//System.out.println("grouping for "+i+"st polygon");
 			LinkedList<Polygon> todoList = new LinkedList<>();
 			todoList.add(startP);
 			groupTable.put(startP, groupCounter);
-			int size = todoList.size();
-			for (int j = 0; j < size; j++) {
-				Polygon currPolygon = todoList.get(j);
-				for (Edge e : startP.getEdges()) {
-					ArrayList<Integer> shareEdgeList = edgeTable.get(e);
-					if (shareEdgeList.size() != 2) {
-						System.out.println("incorrect shared edge "+shareEdgeList.size());
-					}
-					//System.out.println("correct shared edge "+shareEdgeList.size());
-					Polygon nearPolygon = polygons.get(shareEdgeList.get(0));
-					if (!nearPolygon.equals(currPolygon)) {
-						if(getAngle(currPolygon, nearPolygon) <= threshold) {
-							todoList.add(nearPolygon);
-							groupTable.put(nearPolygon, groupCounter);
+			while (!todoList.isEmpty()) {
+				int size = todoList.size();
+				for (int j = 0; j < size; j++) {
+					Polygon currPolygon = todoList.getFirst();
+					for (Edge e : currPolygon.getEdges()) {
+						ArrayList<Integer> shareEdgeList = edgeTable.get(e);
+						if (shareEdgeList.size() != 2) {
+							System.out.println("incorrect shared edge "+shareEdgeList.size());
 						}
-						//polygons.get(shareEdgeList.get(0));
-						//System.out.println("one diff");
-					}
-					nearPolygon = polygons.get(shareEdgeList.get(1));
-					if (!nearPolygon.equals(currPolygon)) {
-						if (getAngle(currPolygon, nearPolygon) <= threshold) {
-							todoList.add(nearPolygon);
-							groupTable.put(nearPolygon, groupCounter);
+						//System.out.println("correct shared edge "+shareEdgeList.size());
+						Polygon nearPolygon = polygons.get(shareEdgeList.get(0));
+						if (!nearPolygon.equals(currPolygon)) {
+							if(getAngle(currPolygon, nearPolygon) <= threshold) {
+								if (groupTable.containsKey(nearPolygon)) {
+									continue;
+								}
+								todoList.add(nearPolygon);
+								groupTable.put(nearPolygon, groupCounter);
+							}
+							//polygons.get(shareEdgeList.get(0));
+							//System.out.println("one diff");
 						}
-						//todoList.add(polygons.get(shareEdgeList.get(1)));
-						//System.out.println("one diff");
+						nearPolygon = polygons.get(shareEdgeList.get(1));
+						if (!nearPolygon.equals(currPolygon)) {
+							if (getAngle(currPolygon, nearPolygon) <= threshold) {
+								if (groupTable.containsKey(nearPolygon)) {
+									continue;
+								}
+								todoList.add(nearPolygon);
+								groupTable.put(nearPolygon, groupCounter);
+							}
+							//todoList.add(polygons.get(shareEdgeList.get(1)));
+							//System.out.println("one diff");
+						}
 					}
+					//System.out.println("prev size"+todoList.size());
+					todoList.remove();
+					//System.out.println(todoList.size());
 				}
-				todoList.remove();
 			}
 		}
+		System.out.println("group number: "+(groupCounter+1));
 	}
 	private static double getModule(Vertex v) {
 		return Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getY(), 2) + Math.pow(v.getZ(), 2));
@@ -175,7 +186,7 @@ public class StlReader {
 		}
 		if (numerator < 0) {
 			//System.out.println(Math.toDegrees(Math.PI/2+Math.acos(Math.abs(numerator/m1*m2))));
-			return Math.PI/2 + Math.acos(Math.abs(numerator/m1*m2));
+			return Math.PI - Math.acos(Math.abs(numerator/m1*m2));
 		} else {
 			//System.out.println(Math.toDegrees(Math.acos(numerator/m1*m2)));
 			return Math.acos(numerator/m1*m2);
