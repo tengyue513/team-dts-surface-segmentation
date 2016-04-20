@@ -53,6 +53,7 @@ public class VrmlWriter {
                 writer.write(vertexIndexTable.get(vertices[2]) + " ");
                 writer.write("-1");
             }
+            int count = 1;
             while (itrP.hasNext()) {
                 Polygon p = itrP.next();
                 Vertex[] vertices = p.getVertexes();
@@ -61,8 +62,9 @@ public class VrmlWriter {
                 writer.write(vertexIndexTable.get(vertices[1]) + " ");
                 writer.write(vertexIndexTable.get(vertices[2]) + " ");
                 writer.write("-1");
+                count++;
             }
-
+            System.out.println("drawed polygon:"+count);
             writer.write("]\n");
             writer.write("color Color{\n");
             writer.write("color[");
@@ -96,6 +98,7 @@ public class VrmlWriter {
                 writer.write(groupTable.get(p) + " ");
                 writer.write("-1");
             }
+            count=1;
             while (itrP.hasNext()) {
                 Polygon p = itrP.next();
                 Vertex[] vertices = p.getVertexes();
@@ -104,8 +107,9 @@ public class VrmlWriter {
                 writer.write(groupTable.get(p) + " ");
                 writer.write(groupTable.get(p) + " ");
                 writer.write("-1");
+                count++;
             }
-
+            System.out.println("corlor count: "+count);
             writer.write("]\n");
             writer.write("}\n");
             writer.write("}\n");
