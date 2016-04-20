@@ -73,7 +73,25 @@ public class Polygon {
     
     @Override
     public String toString() {
-        return "Vertexes: " + vertexes[0].print() + " " + vertexes[1].print() + " " + vertexes[2].print() 
-                + " Normal: " + normal.toString();
+        return vertexes[0].toString() + " " + vertexes[1].toString() + " " + vertexes[2].toString();
+    }
+    
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        boolean result = false;
+        if (object == null || object.getClass() != getClass()) {
+            result = false;
+        } else {
+            Polygon other = (Polygon) object;
+            if (toString().equals(other.toString())) {
+                result = true;
+            }
+        }
+        return result;
     }
 }
