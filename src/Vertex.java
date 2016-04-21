@@ -57,6 +57,23 @@ public class Vertex {
         vertex[2] = z;
     }
     
+    public double magnitude() {
+        return Math.sqrt(vertex[0] * vertex[0] + vertex[1] * vertex[1]
+                + vertex[2] * vertex[2]);
+    }
+    
+    public double dotProduct(Vertex other) {
+        return vertex[0] * other.getX() + vertex[1] * other.getY()
+                + vertex[2] * other.getZ();
+    }
+    
+    public Vertex crossProduct(Vertex other) {
+        Vertex cp = new Vertex(vertex[1] * other.getZ() - vertex[2] * other.getY(),
+                vertex[2] * other.getX() - vertex[0] * other.getZ(),
+                vertex[0] * other.getY() - vertex[1] * other.getX());
+        return cp;
+    }
+    
     public String print() {
         return "x: " + getX() + ", y: " + getY() + ", z: " + getZ();
     }

@@ -3,14 +3,23 @@ public class Edge {
 
     private static final int PointNum = 2;
     private Vertex[] edge = new Vertex[PointNum];
+    private double weight;
     
     public Edge(Vertex[] edge){
         setEdges(edge);
+        setWeight(0);
     }
     
     public Edge(Vertex vertex, Vertex vertex2) {
         edge[0] = vertex;
         edge[1] = vertex2;
+        setWeight(0);
+    }
+    
+    public Edge(Vertex vertex, Vertex vertex2, double weight) {
+        edge[0] = vertex;
+        edge[1] = vertex2;
+        this.setWeight(weight);
     }
 
     private boolean ensurePointNum(Vertex[] edge) {
@@ -30,6 +39,14 @@ public class Edge {
         }
     }
     
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
     @Override
     public String toString() {
         String vertexString1 = edge[0].toString();

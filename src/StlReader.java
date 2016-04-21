@@ -8,7 +8,8 @@ import java.util.Scanner;
 
 public class StlReader {
 	public static int polygonCounter = 0;
-	public static Hashtable<Integer,Polygon> polygons = new Hashtable<>();
+//	public static Hashtable<Integer,Polygon> polygons = new Hashtable<>();
+	public static ArrayList<Polygon> polygons = new ArrayList<>();
 	public static Hashtable<Edge,ArrayList<Integer>> edgeTable = new Hashtable<>();
 	public static Hashtable<Polygon, Integer> groupTable = new Hashtable<>(); 
 	/**.
@@ -57,7 +58,8 @@ public class StlReader {
 						}
 					}
 					p = new Polygon(point,normal);
-					polygons.put(polygonCounter, p);
+					//polygons.put(polygonCounter, p);
+					polygons.add(p);
 					// put vertex into table
 					for (i =0; i < 3; i++) {
 						if (vertexTable.containsKey(point[i])) {
