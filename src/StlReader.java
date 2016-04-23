@@ -1,14 +1,20 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import jdk.internal.dynalink.beans.StaticClass;
+
+import org.omg.CORBA.PRIVATE_MEMBER;
+
 
 public class StlReader {
 	public static int polygonCounter = 0;
-//	public static Hashtable<Integer,Polygon> polygons = new Hashtable<>();
+	//public static Hashtable<Integer,Polygon> polygons = new Hashtable<>();
 	public static ArrayList<Polygon> polygons = new ArrayList<>();
 	public static Hashtable<Edge,ArrayList<Integer>> edgeTable = new Hashtable<>();
 	public static Hashtable<Polygon, Integer> groupTable = new Hashtable<>(); 
@@ -21,7 +27,30 @@ public class StlReader {
 	 * store all the vertex in one set
 	 */
 	public static Hashtable<Vertex,Integer> vertexIndexTable = new Hashtable<>();
-
+	/**.
+	 * average geodistance of all polygons
+	 */
+	public static double avgGeod;
+	/**.
+	 * average angular distance of all polygons
+	 */
+	public static double avgAngd;
+	/**.
+	 * k-way value
+	 */
+	public static final int K_WAY = 2;
+	/**.
+	 * representative array of patches' face index
+	 */
+	public static int[] patchIndex = new int[K_WAY];
+	/**.
+	 * shortest path table from Dijkstra
+	 */
+	public static HashMap<Edge,Double> pathMap;
+	/**.
+	 * 
+	 * @param fileName
+	 */
 	public static void readFile(String fileName) {
 		read(fileName);
 	}
@@ -58,7 +87,6 @@ public class StlReader {
 						}
 					}
 					p = new Polygon(point,normal);
-					//polygons.put(polygonCounter, p);
 					polygons.add(p);
 					// put vertex into table
 					for (i =0; i < 3; i++) {
@@ -92,6 +120,8 @@ public class StlReader {
 				vertexIndexTable.put(v, value);
 				value++;
 			}
+			
+			pathMap = Dijkstra.shortestDistances(polygons, edgeTable);
 			//System.out.println(polygonCounter);
 			//Vertex v = new Vertex(0,0, 1);
 			//	Vertex v2 = new Vertex(0.05, 0, 0.99875);
@@ -109,6 +139,93 @@ public class StlReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public static void updatePatchIndex() {
+		
+		for (int i=0; i < K_WAY; i++) {
+			patchIndex[i] = -1;
+		}
+		double miniDist = Double.POSITIVE_INFINITY;
+		double maxDist = 0;
+		int miniIndex = 0;
+		int maxIndex = 0;
+		double dist;
+		int index;
+		for (int i=0; i < K_WAY; i++) {
+			miniDist = Double.POSITIVE_INFINITY;
+			maxDist = 0;
+			miniIndex = 0;
+			maxIndex = 0;
+			if (i == 0) {
+				for (int j = 0; j < polygonCounter; j++) {
+					Polygon currPolygon = polygons.get(j);
+					dist = 0;
+					index = j;
+					for (int k = 0; k < polygonCounter; k++) {
+						if (k != j) {
+							// sum up all dist
+							Edge e = new Edge(currPolygon.getCom(), polygons.get(k).getCom());
+							dist+=pathMap.get(e);
+						}
+					}
+					if (dist < miniDist) {
+						miniDist = dist;
+						miniIndex = index;
+					}
+				}
+				patchIndex[i] = miniIndex;
+			} else {
+				for (int j = 0; j < polygonCounter; j++) {
+					dist = 0;
+					index = j;
+					Polygon currPolygon = polygons.get(j);
+					for (int k=0;k<i;k++) {
+						if (j != patchIndex[k]) {
+							Edge e = new Edge(currPolygon.getCom(), polygons.get(patchIndex[k]).getCom());
+							//System.out.println(e);
+							dist+=pathMap.get(e);
+							//System.out.println(pathMap.get(e));
+						}
+					}
+					if (dist > maxDist) {
+						maxDist = dist;
+						maxIndex = index;
+					}
+				}
+				patchIndex[i] = maxIndex;
+			}
+		}
+		System.out.println("patch index are:"+Arrays.toString(patchIndex));
+	}
+	public static void avgDistCalculation() {
+		double totalGeoDistance = 0;
+		double totalAngDistance = 0;
+		double eta = 1.0;
+		for (int i = 0; i < polygonCounter; i++) {
+			Polygon currPolygon = polygons.get(i);
+			for (Edge e : currPolygon.getEdges()) {
+				ArrayList<Integer> shareEdgeList = edgeTable.get(e);
+				if (shareEdgeList.size() != 2) {
+					System.out.println("incorrect shared edge "+shareEdgeList.size());
+					continue;
+				}
+				Polygon nearPolygon = polygons.get(shareEdgeList.get(0));
+				if (!nearPolygon.equals(currPolygon)) {
+				} else {
+					nearPolygon = polygons.get(shareEdgeList.get(1));
+				}
+				totalGeoDistance+=currPolygon.geoDistance(nearPolygon);
+				// if convex, then eta should be less
+				if (!currPolygon.isConcave(nearPolygon)) {
+					eta = 0.5;
+				}
+				totalAngDistance+=currPolygon.angDistance(nearPolygon, eta);
+			}
+		}
+		avgGeod = totalGeoDistance/(2*polygonCounter);
+		avgAngd = totalAngDistance/(2*polygonCounter);
+		System.out.println("average geometric distance is :" + avgGeod);
+		System.out.println("average angular distance is :" + avgAngd);
 	}
 	public static void bfs(double threshold) {
 		int groupCounter = -1;
