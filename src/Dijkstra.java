@@ -119,14 +119,18 @@ public class Dijkstra {
                 ArrayList<Integer> adjacencyList = edgeTable.get(e);
                 int index = adjacencyList.get(0);
                 if (!vertexDs[index].polygon.equals(vertexD.polygon)) {
-                    vertexD.adjacencies.add(new EdgeD(vertexDs[index],
-                            weight(vertexD.polygon, vertexDs[index].polygon)));
+                  vertexD.adjacencies.add(new EdgeD(vertexDs[index],
+                  1));
+//                    vertexD.adjacencies.add(new EdgeD(vertexDs[index],
+//                            weight(vertexD.polygon, vertexDs[index].polygon)));
                     // System.out.println("add " + vertexDs[index] + " weight "
                     // + index);
                 } else if (adjacencyList.size() > 1) {
                     index = adjacencyList.get(1);
                     vertexD.adjacencies.add(new EdgeD(vertexDs[index],
-                            weight(vertexD.polygon, vertexDs[index].polygon)));
+                            1));
+//                    vertexD.adjacencies.add(new EdgeD(vertexDs[index],
+//                            weight(vertexD.polygon, vertexDs[index].polygon)));
                     // System.out.println("add " + vertexDs[index] + " weight "
                     // + index);
                 }
@@ -137,8 +141,8 @@ public class Dijkstra {
             computePaths(vertexD);
             System.out.println("Compute for " + vertexD);
             for (VertexD v : vertexDs) {
-                // System.out.println("Distance to " + v + ": " +
-                // v.minDistance);
+                System.out.println("Distance to " + v + ": " +
+                v.minDistance);
                 // List<VertexD> path = getShortestPathTo(v);
                 // System.out.println("Path: " + path);
                 if (v.minDistance != Double.POSITIVE_INFINITY
@@ -147,6 +151,10 @@ public class Dijkstra {
                             v.polygon.getCom());
                     map.put(e, v.minDistance);
                 }
+            }
+            for (VertexD v : vertexDs) {
+                v.minDistance = Double.POSITIVE_INFINITY;
+                v.previous = null;
             }
         }
         System.out.println(map);
