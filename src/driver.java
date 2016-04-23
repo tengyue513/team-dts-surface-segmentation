@@ -9,7 +9,7 @@ public class driver {
 //			System.out.println(p);
 //			System.out.println(sr.groupTable.get(p));
 //		}
-		//System.out.println(sr.groupTable.keySet().size());
+		System.out.println(sr.groupTable.keySet().size());
 		//System.out.println(sr.vertexIndexTable);
 		//VrmlWriter.write(sr.groupTable, sr.vertexList, sr.vertexIndexTable, "test.wrl");
 		HashMap<Edge,Double> map = Dijkstra.shortestDistances(sr.polygons, sr.edgeTable);

@@ -105,7 +105,7 @@ public class Dijkstra {
                 if (!vertexDs[index].polygon.equals(vertexD.polygon)) {
                     vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
                     //System.out.println("add " + vertexDs[index] + " weight " + index);
-                } else {
+                } else if (adjacencyList.size() > 1) {
                     index = adjacencyList.get(1);
                     vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
                     //System.out.println("add " + vertexDs[index] + " weight " + index);
