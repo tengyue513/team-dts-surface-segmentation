@@ -1,3 +1,4 @@
+
 /* The authors of this work have released all rights to it and placed it
 in the public domain under the Creative Commons CC0 1.0 waiver
 (http://creativecommons.org/publicdomain/zero/1.0/).
@@ -21,15 +22,15 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 class VertexD implements Comparable<VertexD> {
-    //public final String name;
+    // public final String name;
     public final Polygon polygon;
     public ArrayList<EdgeD> adjacencies;
     public double minDistance = Double.POSITIVE_INFINITY;
     public VertexD previous;
 
-//    public VertexD(String argName) {
-//        name = argName;
-//    }
+    // public VertexD(String argName) {
+    // name = argName;
+    // }
     public VertexD(Polygon polygon) {
         this.polygon = polygon;
     }
@@ -86,11 +87,26 @@ public class Dijkstra {
         Collections.reverse(path);
         return path;
     }
-    
-    public static HashMap<Edge,Double> shortestDistances(ArrayList<Polygon> polygons,
+
+    private static double weight(Polygon p1, Polygon p2) {
+        double delta = 0.5;
+        double avgGeod = StlReader.avgGeod;
+        double avgAngd = StlReader.avgAngd;
+        double geod = p1.geoDistance(p2);
+        double angd;
+        if (p1.isConcave(p2)) {
+            angd = p1.angDistance(p2, 1.0);
+        } else {
+            angd = p1.angDistance(p2, StlReader.eta);
+        }
+        return delta * geod / avgGeod + (1 - delta) * angd / avgAngd;
+    }
+
+    public static HashMap<Edge, Double> shortestDistances(
+            ArrayList<Polygon> polygons,
             Hashtable<Edge, ArrayList<Integer>> edgeTable) {
-        HashMap<Edge,Double> map = new HashMap<Edge,Double>();
-        
+        HashMap<Edge, Double> map = new HashMap<Edge, Double>();
+
         VertexD[] vertexDs = new VertexD[polygons.size()];
         for (int i = 0; i < vertexDs.length; i++) {
             Polygon p = polygons.get(i);
@@ -103,12 +119,16 @@ public class Dijkstra {
                 ArrayList<Integer> adjacencyList = edgeTable.get(e);
                 int index = adjacencyList.get(0);
                 if (!vertexDs[index].polygon.equals(vertexD.polygon)) {
-                    vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
-                    //System.out.println("add " + vertexDs[index] + " weight " + index);
+                    vertexD.adjacencies.add(new EdgeD(vertexDs[index],
+                            weight(vertexD.polygon, vertexDs[index].polygon)));
+                    // System.out.println("add " + vertexDs[index] + " weight "
+                    // + index);
                 } else if (adjacencyList.size() > 1) {
                     index = adjacencyList.get(1);
-                    vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
-                    //System.out.println("add " + vertexDs[index] + " weight " + index);
+                    vertexD.adjacencies.add(new EdgeD(vertexDs[index],
+                            weight(vertexD.polygon, vertexDs[index].polygon)));
+                    // System.out.println("add " + vertexDs[index] + " weight "
+                    // + index);
                 }
             }
         }
@@ -117,12 +137,14 @@ public class Dijkstra {
             computePaths(vertexD);
             System.out.println("Compute for " + vertexD);
             for (VertexD v : vertexDs) {
-                //System.out.println("Distance to " + v + ": " + v.minDistance);
-                //List<VertexD> path = getShortestPathTo(v);
-                //System.out.println("Path: " + path);
-                if (v.minDistance != Double.POSITIVE_INFINITY &&
-                        v.minDistance != 0.0) {
-                    Edge e = new Edge(vertexD.polygon.getCom(), v.polygon.getCom());
+                // System.out.println("Distance to " + v + ": " +
+                // v.minDistance);
+                // List<VertexD> path = getShortestPathTo(v);
+                // System.out.println("Path: " + path);
+                if (v.minDistance != Double.POSITIVE_INFINITY
+                        && v.minDistance != 0.0) {
+                    Edge e = new Edge(vertexD.polygon.getCom(),
+                            v.polygon.getCom());
                     map.put(e, v.minDistance);
                 }
             }
@@ -131,36 +153,36 @@ public class Dijkstra {
         return map;
     }
 
-//    public static void main(String[] args) {
-//        StlReader sr = new StlReader();
-//        sr.read("cube1.stl");
-//        VertexD[] vertexDs = new VertexD[sr.polygons.size()];
-//        for (int i = 0; i < vertexDs.length; i++) {
-//            Polygon p = sr.polygons.get(i);
-//            vertexDs[i] = new VertexD(p);
-//        }
-//        for (VertexD vertexD : vertexDs) {
-//            vertexD.adjacencies = new ArrayList<EdgeD>();
-//            for (Edge e : vertexD.polygon.getEdges()) {
-//                ArrayList<Integer> adjacencyList = sr.edgeTable.get(e);
-//                int index = adjacencyList.get(0);
-//                if (!vertexDs[index].polygon.equals(vertexD.polygon)) {
-//                    vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
-//                    //System.out.println("add " + vertexDs[index] + " weight " + index);
-//                } else {
-//                    index = adjacencyList.get(1);
-//                    vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
-//                    //System.out.println("add " + vertexDs[index] + " weight " + index);
-//                }
-//            }
-//        }
-//
-//        computePaths(vertexDs[0]);
-//        System.out.println("Compute for " + vertexDs[0]);
-//        for (VertexD v : vertexDs) {
-//            System.out.println("Distance to " + v + ": " + v.minDistance);
-//            List<VertexD> path = getShortestPathTo(v);
-//            System.out.println("Path: " + path);
-//        }
-//    }
+    // public static void main(String[] args) {
+    // StlReader sr = new StlReader();
+    // sr.read("cube1.stl");
+    // VertexD[] vertexDs = new VertexD[sr.polygons.size()];
+    // for (int i = 0; i < vertexDs.length; i++) {
+    // Polygon p = sr.polygons.get(i);
+    // vertexDs[i] = new VertexD(p);
+    // }
+    // for (VertexD vertexD : vertexDs) {
+    // vertexD.adjacencies = new ArrayList<EdgeD>();
+    // for (Edge e : vertexD.polygon.getEdges()) {
+    // ArrayList<Integer> adjacencyList = sr.edgeTable.get(e);
+    // int index = adjacencyList.get(0);
+    // if (!vertexDs[index].polygon.equals(vertexD.polygon)) {
+    // vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
+    // //System.out.println("add " + vertexDs[index] + " weight " + index);
+    // } else {
+    // index = adjacencyList.get(1);
+    // vertexD.adjacencies.add(new EdgeD(vertexDs[index], index));
+    // //System.out.println("add " + vertexDs[index] + " weight " + index);
+    // }
+    // }
+    // }
+    //
+    // computePaths(vertexDs[0]);
+    // System.out.println("Compute for " + vertexDs[0]);
+    // for (VertexD v : vertexDs) {
+    // System.out.println("Distance to " + v + ": " + v.minDistance);
+    // List<VertexD> path = getShortestPathTo(v);
+    // System.out.println("Path: " + path);
+    // }
+    // }
 }
