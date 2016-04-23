@@ -36,6 +36,10 @@ public class StlReader {
 	 */
 	public static double avgAngd;
 	/**.
+	 * eta
+	 */
+	public static double eta = 0.5;
+	/**.
 	 * k-way value
 	 */
 	public static final int K_WAY = 2;
@@ -200,7 +204,6 @@ public class StlReader {
 	public static void avgDistCalculation() {
 		double totalGeoDistance = 0;
 		double totalAngDistance = 0;
-		double eta = 1.0;
 		for (int i = 0; i < polygonCounter; i++) {
 			Polygon currPolygon = polygons.get(i);
 			for (Edge e : currPolygon.getEdges()) {
