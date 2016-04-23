@@ -87,9 +87,9 @@ public class Dijkstra {
         return path;
     }
     
-    public static HashMap<ArrayList<Polygon>,Double> shortestDistances(ArrayList<Polygon> polygons,
+    public static HashMap<Edge,Double> shortestDistances(ArrayList<Polygon> polygons,
             Hashtable<Edge, ArrayList<Integer>> edgeTable) {
-        HashMap<ArrayList<Polygon>,Double> map = new HashMap<ArrayList<Polygon>,Double>();
+        HashMap<Edge,Double> map = new HashMap<Edge,Double>();
         
         VertexD[] vertexDs = new VertexD[polygons.size()];
         for (int i = 0; i < vertexDs.length; i++) {
@@ -122,10 +122,8 @@ public class Dijkstra {
                 //System.out.println("Path: " + path);
                 if (v.minDistance != Double.POSITIVE_INFINITY &&
                         v.minDistance != 0.0) {
-                    ArrayList<Polygon> list = new ArrayList<Polygon>();
-                    list.add(vertexD.polygon);
-                    list.add(v.polygon);
-                    map.put(list, v.minDistance);
+                    Edge e = new Edge(vertexD.polygon.getCom(), v.polygon.getCom());
+                    map.put(e, v.minDistance);
                 }
             }
         }
