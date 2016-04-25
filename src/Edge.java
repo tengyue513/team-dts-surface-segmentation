@@ -12,6 +12,7 @@ public class Edge {
         edge[0] = vertex;
         edge[1] = vertex2;
     }
+    
 
     private boolean ensurePointNum(Vertex[] edge) {
         if (edge.length == PointNum) {

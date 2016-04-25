@@ -40,7 +40,6 @@ public class Polygon {
         
         this.normal = normal;
     }
-    
     private boolean needRevert(Vertex[] vertexes, Vertex normal) {
         Vertex vec1 = new Vertex(vertexes[1].getX() - vertexes[0].getX(),
                 vertexes[1].getY() - vertexes[0].getY(),
