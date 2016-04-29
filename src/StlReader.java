@@ -48,15 +48,11 @@ public class StlReader {
 	/**.
 	 * eta
 	 */
-	public static double eta = 0.1;
+	public static double eta = 0.5;
 	/**.
 	 * k-way value
 	 */
-	public static final int K_WAY = 15;
-	/**.
-	 * level of division
-	 */
-	public static final int level = 2;
+	public static final int K_WAY = 7;
 	/**.
 	 * representative array of patches' face index
 	 */
@@ -72,6 +68,9 @@ public class StlReader {
 	public static void readFile(String fileName) {
 		read(fileName);
 	}
+	/**.
+	 * calculate G(k) value
+	 */
 	public static void findPatchNum() {
 		double miniDist = Double.POSITIVE_INFINITY;
 		double dist = 0.0;
@@ -85,32 +84,8 @@ public class StlReader {
 					miniDist = dist;
 				}
 			}
-			System.out.println("miniDist for polygon "+patchIndex[i]+" "+miniDist);
+			System.out.println(miniDist);
 		}
-	}
-	public static void findBinaryPatch() {
-		double maxDist = 0.0;
-		Polygon p1 = polygons.get(0);
-		Polygon p2 = polygons.get(0);
-		Polygon currP;
-		Polygon checkP;
-		// given a map of distance pair, find two face with largest dist
-		for (int i = 0; i < polygonCounter; i++) {
-			currP = polygons.get(i);
-			for (int j = 0; j < polygonCounter; j++) {
-				if (i != j) {
-					checkP = polygons.get(j);
-					if (pathMap.get(new Edge(currP.getCom(), checkP.getCom())) > maxDist) {
-						maxDist = pathMap.get(new Edge(currP.getCom(), checkP.getCom()));
-						p1 = currP;
-						p2 = checkP;
-					}
-				}
-			}
-		}
-		patchIndex[0] = polygon2IndexTable.get(p1);
-		patchIndex[1] = polygon2IndexTable.get(p2);
-		System.out.println(Arrays.toString(patchIndex));
 	}
 	public static void divideIntoPatch() {
 		group2PolygonTable = new Hashtable<>();
@@ -263,12 +238,16 @@ public class StlReader {
 			e.printStackTrace();
 		}
 	}
+	/**.
+	 * find patch index for each patch
+	 */
 	public static void updatePatchIndex() {		
 		for (int i=0; i < K_WAY; i++) {
 			patchIndex[i] = -1;
 		}
 		double miniDist = Double.POSITIVE_INFINITY;
 		double maxDist = 0;
+		double subMaxDist = Double.POSITIVE_INFINITY;
 		int miniIndex = 0;
 		int maxIndex = 0;
 		double dist;
@@ -310,17 +289,21 @@ public class StlReader {
 					}
 					dist = 0;
 					index = j;
+					subMaxDist = Double.POSITIVE_INFINITY;
 					Polygon currPolygon = polygons.get(j);
 					for (int k=0;k<i;k++) {
 						//System.out.println("current polygon index:"+index);
 						Edge e = new Edge(currPolygon.getCom(), polygons.get(patchIndex[k]).getCom());
 						//System.out.println(e);
-						dist+=pathMap.get(e);
+						dist = pathMap.get(e);
+						if (dist < subMaxDist) {
+							subMaxDist = dist;
+						}
 						//System.out.println(pathMap.get(e));
 					}
 					//System.out.println("current distance:"+dist);
-					if (dist > maxDist) {
-						maxDist = dist;
+					if (subMaxDist > maxDist) {
+						maxDist = subMaxDist;
 						maxIndex = index;
 					}
 				}
@@ -334,42 +317,7 @@ public class StlReader {
 		}
 		System.out.println("patch index are:"+Arrays.toString(patchIndex));
 	}
-	public static void randomDefinePatch() {
-		for (int i = 0; i < K_WAY; i++) {
-			patchIndex[i] = i+2;
-		}
-		System.out.println("fist patch index:"+Arrays.toString(patchIndex));
-	}
-	public static void redefinePatchIndex() {
-		// for each group, select a new center as new patch index
-		Vertex avgCenter = new Vertex(0,0,0);
-		double miniDist = Double.POSITIVE_INFINITY;
-		int miniIndex = 0;
-		double dist = 0.0;
-		int index = 0;
-		for (int i=0;i<group2PolygonTable.keySet().size();i++) {
-			miniDist = Double.POSITIVE_INFINITY;
-			dist = 0.0;
-			avgCenter = new Vertex(0,0,0);
-			ArrayList<Polygon> list = group2PolygonTable.get(i);
-			System.out.println("group size:"+list.size());
-			// find the index of polygon which has the smallest sum of dist to all polygons in that group
-			for (int j =0;j<list.size();j++) {
-				Polygon p = list.get(j);
-				for (Polygon p2 : list) {
-					if (!p.equals(p2)) {
-						dist+=pathMap.get(new Edge(p.getCom(), p2.getCom()));
-					}
-				}
-				if (dist < miniDist) {
-					miniDist = dist;
-					miniIndex = polygon2IndexTable.get(p);
-				}
-			}
-			patchIndex[i]=miniIndex;
-		}
-		System.out.println("refined index:"+Arrays.toString(patchIndex));
-	}
+
 	public static void avgDistCalculation() {
 		double totalGeoDistance = 0;
 		double totalAngDistance = 0;
